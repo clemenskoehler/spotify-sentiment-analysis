@@ -1,14 +1,16 @@
-from spotify_api import get_playlist_tracks
-from genius_api import authenticate, get_lyrics
+from spotify_api import SpotifyAPI
+from genius_api import GeniusAPI
+import nltk
+from nltk.corpus import stopwords
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import textblob
 
 
 class SentimentAnalyzer:
     def __init__(self):
         self.sid = SentimentIntensityAnalyzer()
 
-
-    def get_lyrics_for_playlist(playlist_id, client_access_token):
+    def get_lyrics_for_playlist(self, playlist_id, client_access_token):
         """
         Retrieve the lyrics for all songs in a Spotify playlist.
         
@@ -19,23 +21,25 @@ class SentimentAnalyzer:
         Returns:
             A dictionary mapping song names to lyrics.
         """
+        genius = GeniusAPI()
+
         # Authenticate with the Genius API
-        genius = authenticate(<your Genius API client access token here>)
+        genius.authenticate("-YBRRHhrBgG0JIqi29wYKqNhvlilQ6heuJaN0VOR0z2eNiL4MadFf4PV_juK4cbD")
         
         # Get the tracks in the playlist
-        tracks = get_playlist_tracks(<your Spotify API client access token here>, playlist_id)
+        tracks = SpotifyAPI.get_playlist_tracks(playlist_id)
         
         # Retrieve the lyrics for each track in the playlist
         lyrics_dict = {}
         for track in tracks:
             title = track['name']
             artist = track['artists'][0]['name']
-            lyrics = get_lyrics(genius, title, artist)
+            lyrics = genius.get_lyrics(title, artist)
             lyrics_dict[title] = lyrics
         
         return lyrics_dict
 
-    def analyze_lyrics(lyrics_dict):
+    def analyze_lyrics(self, lyrics_dict):
         """
         Perform sentiment analysis on a dictionary of lyrics using the VADER sentiment analyzer.
         
@@ -45,21 +49,19 @@ class SentimentAnalyzer:
         Returns:
             A dictionary mapping song names to sentiment scores.
         """
-        # Initialize the sentiment analyzer
-        sia = SentimentIntensityAnalyzer()
         
         # Analyze the lyrics for each song in the playlist
         scores_dict = {}
         for title, lyrics in lyrics_dict.items():
             if lyrics is not None:
                 # Compute the sentiment scores for the lyrics
-                scores = sia.polarity_scores(lyrics)
+                scores = self.sid.polarity_scores(lyrics)
                 # Add the scores to the dictionary
                 scores_dict[title] = scores
         
         return scores_dict
 
-    def suggest_songs(scores_dict, sentiment, num_songs):
+    def suggest_songs(self, scores_dict, sentiment, num_songs):
         """
         Suggest new songs to the user based on their desired sentiment.
         
@@ -73,9 +75,9 @@ class SentimentAnalyzer:
         """
         # Determine the sentiment threshold for the desired sentiment
         if sentiment == 'positive':
-            threshold = 0.5
+            threshold = 0.05
         elif sentiment == 'negative':
-            threshold = -0.5
+            threshold = -0.05
         else:
             return None
         
