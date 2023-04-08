@@ -5,13 +5,12 @@ class SpotifyAPI:
     def __init__(self):
         self.spotify = None
 
-    def authenticate(self, scope, username=None, client_id=None, client_secret=None, redirect_uri=None):
+    def authenticate(self, scope, client_id=None, client_secret=None, redirect_uri=None):
         """
         Authenticate with the Spotify API using the SpotifyOAuth class from the spotipy library.
 
         Parameters:
             scope (str or list of str): A list of scope strings corresponding to the permissions you want to request.
-            username (str): The Spotify username of the user you want to authenticate as. If None, the current user is used.
             client_id (str): Your Spotify client ID.
             client_secret (str): Your Spotify client secret.
             redirect_uri (str): The redirect URI for your application, as specified in your Spotify developer dashboard.
@@ -19,13 +18,10 @@ class SpotifyAPI:
         Returns:
             A spotipy.Spotify object authenticated with the specified user's account.
         """
-        if username is None:
-            username = spotipy.Spotify().me()['id']
         self.spotify = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
                                                        client_id=client_id,
                                                        client_secret=client_secret,
-                                                       redirect_uri=redirect_uri,
-                                                       username=username))
+                                                       redirect_uri=redirect_uri))
 
     def get_playlist_tracks(self, playlist_id):
         """
