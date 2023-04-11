@@ -14,8 +14,9 @@ class SentimentAnalyzer:
     def __init__(self):
         self.sid = SentimentIntensityAnalyzer()
 
+    """
     def get_lyrics_for_playlist(self, playlist_id, client_access_token):
-        """
+        """"""
         Retrieve the lyrics for all songs in a Spotify playlist.
         
         Parameters:
@@ -24,7 +25,7 @@ class SentimentAnalyzer:
             
         Returns:
             A dictionary mapping song names to lyrics.
-        """
+        """"""
         genius = GeniusAPI()
 
         # Authenticate with the Genius API
@@ -42,6 +43,7 @@ class SentimentAnalyzer:
             lyrics_dict[title] = lyrics
 
         return lyrics_dict
+    """
 
     def analyze_lyrics_vader(self, lyrics_dict):
         """

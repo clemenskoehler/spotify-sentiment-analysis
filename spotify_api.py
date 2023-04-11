@@ -1,6 +1,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 
+
 class SpotifyAPI:
     def __init__(self):
         self.spotify = None
@@ -19,16 +20,42 @@ class SpotifyAPI:
             A spotipy.Spotify object authenticated with the specified user's account.
         """
         self.spotify = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
-                                                       client_id=client_id,
-                                                       client_secret=client_secret,
-                                                       redirect_uri=redirect_uri))
+                                                                 client_id=client_id,
+                                                                 client_secret=client_secret,
+                                                                 redirect_uri=redirect_uri))
+
+    def get_user_playlists(self):
+        """
+        Retrieve the playlists from a Spotify user.
+
+        Returns:
+            A list of playlists of the current user
+        """
+        results = self.spotify.current_user_playlists()
+        playlists = results['items']
+        while results['next']:
+            results = self.spotify.next(results)
+            playlists.extend(results['items'])
+        return playlists
+
+    def get_playlist_info(self, playlist_id):
+        """
+        Retrieve metadata for a single track.
+
+        Parameters:
+            playlist_id (str): The ID of the Spotify playlist.
+
+        Returns:
+            A dictionary containing metadata for the playlist.
+        """
+        playlist = self.spotify.playlist(playlist_id)
+        return playlist
 
     def get_playlist_tracks(self, playlist_id):
         """
         Retrieve the tracks from a Spotify playlist.
 
         Parameters:
-            sp (spotipy.Spotify): A spotipy.Spotify object authenticated with the user's Spotify account.
             playlist_id (str): The ID of the Spotify playlist.
 
         Returns:
@@ -41,18 +68,26 @@ class SpotifyAPI:
             tracks.extend(results['items'])
         return tracks
 
+    def get_tracks_info(self, track_ids):
+        tracks = []
+
+        for track_id in track_ids:
+            track = self.spotify.track(str(track_id))
+            tracks.append(track)
+
+        return tracks
+
     def get_track_info(self, track_id):
         """
         Retrieve metadata for a single track.
 
         Parameters:
-            sp (spotipy.Spotify): A spotipy.Spotify object authenticated with the user's Spotify account.
             track_id (str): The ID of the Spotify track.
 
         Returns:
             A dictionary containing metadata for the track.
         """
-        track = self.spotify.track(track_id)
+        track = self.spotify.track(str(track_id))
         return track
 
     def get_audio_features(self, track_ids):
@@ -60,7 +95,6 @@ class SpotifyAPI:
         Retrieve audio features for one or more tracks.
 
         Parameters:
-            sp (spotipy.Spotify): A spotipy.Spotify object authenticated with the user's Spotify account.
             track_ids (list of str): A list of Spotify track IDs.
 
         Returns:
@@ -68,5 +102,3 @@ class SpotifyAPI:
         """
         audio_features = self.spotify.audio_features(track_ids)
         return audio_features
-
-
