@@ -36,8 +36,7 @@ class GeniusAPI:
         Retrieve the lyrics for a song.
 
         Parameters:
-            title (str): The title of the song.
-            artist (str): The name of the artist who performed the song.
+            tracks: a list of tracks whose lyrics we want to retrieve
 
         Returns:
             A string containing the lyrics of the song, or None if the song was not found.
@@ -45,7 +44,14 @@ class GeniusAPI:
         tracks_lyrics = {}
 
         for track in tracks:
-            tracks_lyrics[track['name']] = self.genius.search_song(track['name'], track['artist']).lyrics
+            try:
+                song = self.genius.search_song(track['name'], track['artists'][0]['name'])
+                if song is not None:
+                    tracks_lyrics[track['name']] = song.lyrics
+                else:
+                    tracks_lyrics[track['name']] = ""
+            except AttributeError:
+                tracks_lyrics[track['name']] = ""
 
         return tracks_lyrics
 

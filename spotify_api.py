@@ -61,7 +61,7 @@ class SpotifyAPI:
         Returns:
             A list of dictionaries representing the tracks in the playlist, with each dictionary containing track metadata.
         """
-        results = self.spotify.playlist_tracks(playlist_id)
+        results = self.spotify.playlist_items(playlist_id, additional_types=('track',))
         tracks = results['items']
         while results['next']:
             results = self.spotify.next(results)
@@ -72,7 +72,7 @@ class SpotifyAPI:
         tracks = []
 
         for track_id in track_ids:
-            track = self.spotify.track(str(track_id))
+            track = self.spotify.track(str(track_id['track']['id']))
             tracks.append(track)
 
         return tracks

@@ -56,7 +56,7 @@ class SentimentAnalyzer:
             A dictionary mapping song names to sentiment scores.
         """
 
-        lyrics_dict = self.clean_lyrics(lyrics_dict)
+        # lyrics_dict = self.clean_lyrics(lyrics_dict)
 
         # Analyze the lyrics for each song in the playlist
         scores_dict = {}
@@ -79,7 +79,7 @@ class SentimentAnalyzer:
         Returns:
             A dictionary mapping song names to sentiment scores.
         """
-        lyrics_dict = self.clean_lyrics(lyrics_dict)
+        # lyrics_dict = self.clean_lyrics(lyrics_dict)
 
         # Analyze the lyrics for each song in the playlist
         scores_dict = {}
@@ -138,15 +138,15 @@ class SentimentAnalyzer:
         stopwords = nltk.corpus.stopwords.words('english')
 
         for title, lyrics in lyrics_dict.items():
-            lyrics_new = lyrics.str.lower()
-            lyrics_new = lyrics_new.str.replace(r"verse |[1|2|3]|chorus|bridge|outro", "").str.replace("[",
-                                                                                                       "").str.replace(
+            lyrics_new = lyrics.lower()
+            lyrics_new = lyrics_new.replace(r"verse |[1|2|3]|chorus|bridge|outro", "").replace("[",
+                                                                                                       "").replace(
                 "]", "")
-            lyrics_new = lyrics_new.str.lower().str.replace(r"instrumental|intro|guitar|solo", "")
-            lyrics_new = lyrics_new.str.replace("\n", " ").str.replace(r"[^\w\d'\s]+", "")
-            lyrics_new = lyrics_new.str.strip()
+            lyrics_new = lyrics_new.lower().replace(r"instrumental|intro|guitar|solo", "")
+            lyrics_new = lyrics_new.replace("\n", " ").replace(r"[^\w\d'\s]+", "")
+            # lyrics_new = lyrics_new.strip()
             words = word_tokenize(lyrics_new)
             contentwords = [w for w in words if w.lower() not in stopwords]
-            dict_new[title] = [' '.join(map(str, l)) for l in contentwords]
+            dict_new[title] = ' '.join(contentwords)
 
         return dict_new
