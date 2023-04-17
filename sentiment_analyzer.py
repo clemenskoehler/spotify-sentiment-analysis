@@ -5,6 +5,8 @@ from nltk import word_tokenize
 import nltk.data
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from textblob import TextBlob
+import text2emotion as te
+import re
 
 nltk.download('vader_lexicon')
 nltk.download('punkt')
@@ -139,10 +141,11 @@ class SentimentAnalyzer:
 
         for title, lyrics in lyrics_dict.items():
             lyrics_new = lyrics.lower()
-            lyrics_new = lyrics_new.replace(r"verse |[1|2|3]|chorus|bridge|outro", "").replace("[",
-                                                                                                       "").replace(
-                "]", "")
-            lyrics_new = lyrics_new.lower().replace(r"instrumental|intro|guitar|solo", "")
+            lyrics_new = re.sub(r"[\[].*?[\]]", "", lyrics_new)
+            # lyrics_new = lyrics_new.replace(r"verse |[1|2|3]|chorus|bridge|outro", "").replace("[",
+            #                                                                                            "").replace(
+            #     "]", "")
+            # lyrics_new = lyrics_new.lower().replace(r"instrumental|intro|guitar|solo", "")
             lyrics_new = lyrics_new.replace("\n", " ").replace(r"[^\w\d'\s]+", "")
             # lyrics_new = lyrics_new.strip()
             words = word_tokenize(lyrics_new)
@@ -150,3 +153,16 @@ class SentimentAnalyzer:
             dict_new[title] = ' '.join(contentwords)
 
         return dict_new
+
+    def get_lyrics_emotions(self, lyrics_dict):
+        # Analyze the lyrics for each song in the playlist
+        scores_dict = {}
+        for title, lyrics in lyrics_dict.items():
+            if lyrics is not None:
+                # Compute the emotion scores for the lyrics
+                scores = te.get_emotion(lyrics)
+                # Add the scores to the dictionary
+                scores_dict[title] = scores
+
+        return scores_dict
+

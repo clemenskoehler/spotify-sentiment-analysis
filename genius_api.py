@@ -14,7 +14,7 @@ class GeniusAPI:
         Returns:
             A lyricsgenius.Genius object authenticated with the client access token.
         """
-        self.genius = lyricsgenius.Genius(client_access_token)
+        self.genius = lyricsgenius.Genius(client_access_token, timeout=15, retries=3)
 
     def search_song(self, title, artist):
         """
@@ -48,6 +48,7 @@ class GeniusAPI:
                 song = self.genius.search_song(track['name'], track['artists'][0]['name'])
                 if song is not None:
                     tracks_lyrics[track['name']] = song.lyrics
+                    # print(track['name'], ": ", song.lyrics)
                 else:
                     tracks_lyrics[track['name']] = ""
             except AttributeError:
