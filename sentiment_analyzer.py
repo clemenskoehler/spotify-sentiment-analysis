@@ -94,7 +94,7 @@ class SentimentAnalyzer:
 
         return scores_dict
 
-    def suggest_songs(self, scores_dict, sentiment, num_songs):
+    def suggest_songs_vader(self, scores_dict, sentiment, num_songs=10):
         """
         Suggest new songs to the user based on their desired sentiment.
         
@@ -106,24 +106,84 @@ class SentimentAnalyzer:
         Returns:
             A list of song names with the desired sentiment, or None if no songs were found.
         """
-        # Determine the sentiment threshold for the desired sentiment
-        if sentiment == 'positive':
-            threshold = 0.5
-        elif sentiment == 'negative':
-            threshold = -0.5
+        if sentiment == 0 or sentiment == 2:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda x: x[1]['compound'], reverse=True))
         else:
-            return None
-
-        # Sort the songs by sentiment score
-        sorted_songs = sorted(scores_dict.items(), key=lambda x: x[1]['compound'], reverse=True)
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda x: x[1]['compound'], reverse=False))
 
         # Select the songs with the desired sentiment
         suggested_songs = []
-        for title, scores in sorted_songs:
-            if scores['compound'] >= threshold:
-                suggested_songs.append(title)
-                if len(suggested_songs) >= num_songs:
-                    break
+        for title, scores in sorted_songs.items():
+            suggested_songs.append(title)
+            if len(suggested_songs) >= num_songs:
+                break
+
+        return suggested_songs
+
+    def suggest_songs_textblob(self, scores_dict, sentiment, num_songs=10):
+        """
+        Suggest new songs to the user based on their desired sentiment.
+
+        Parameters:
+            scores_dict (dict): A dictionary mapping song names to sentiment scores.
+            sentiment (str): The desired sentiment of the suggested songs, either "positive" or "negative".
+            num_songs (int): The number of songs to suggest.
+
+        Returns:
+            A list of song names with the desired sentiment, or None if no songs were found.
+        """
+        if sentiment == 0 or sentiment == 2:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1], reverse=True))
+        else:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1], reverse=False))
+
+        # Select the songs with the desired sentiment
+        suggested_songs = []
+        for title, scores in sorted_songs.items():
+            suggested_songs.append(title)
+            if len(suggested_songs) >= num_songs:
+                break
+
+        return suggested_songs
+
+    def suggest_songs_t2e(self, scores_dict, sentiment, num_songs=10):
+        """
+        Suggest new songs to the user based on their desired sentiment.
+
+        Parameters:
+            scores_dict (dict): A dictionary mapping song names to sentiment scores.
+            sentiment (str): The desired sentiment of the suggested songs, either "positive" or "negative".
+            num_songs (int): The number of songs to suggest.
+
+        Returns:
+            A list of song names with the desired sentiment, or None if no songs were found.
+        """
+        if sentiment == 0:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1]['Happy'], reverse=True))
+        if sentiment == 1:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1]['Angry'], reverse=True))
+        if sentiment == 2:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1]['Surprise'], reverse=True))
+        if sentiment == 3:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1]['Sad'], reverse=True))
+        else:
+            # Sort the songs by sentiment score
+            sorted_songs = dict(sorted(scores_dict.items(), key=lambda item: item[1]['Fear'], reverse=True))
+
+        # Select the songs with the desired sentiment
+        suggested_songs = []
+        for title, scores in sorted_songs.items():
+            suggested_songs.append(title)
+            if len(suggested_songs) >= num_songs:
+                break
 
         return suggested_songs
 
