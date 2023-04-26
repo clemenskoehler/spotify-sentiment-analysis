@@ -7,6 +7,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from textblob import TextBlob
 import text2emotion as te
 import re
+from easynmt import EasyNMT
 
 nltk.download('vader_lexicon')
 nltk.download('punkt')
@@ -15,6 +16,7 @@ nltk.download('punkt')
 class SentimentAnalyzer:
     def __init__(self):
         self.sid = SentimentIntensityAnalyzer()
+        self.model = EasyNMT('opus-mt')
 
     """
     def get_lyrics_for_playlist(self, playlist_id, client_access_token):
@@ -187,6 +189,16 @@ class SentimentAnalyzer:
 
         return suggested_songs
 
+    def translate_lyrics(self, lyrics_dict):
+        dict_new = {}
+
+        for title, lyrics in lyrics_dict.items():
+            lyrics_new = self.model.translate(lyrics, target_lang='en')
+            print("Translation: ", lyrics_new)
+            dict_new[title] = lyrics_new
+
+        return dict_new
+
     def clean_lyrics(self, lyrics_dict):
         """
         Function to clean lyrics from unuseful words, such as stopwords or "chorus" etc.
@@ -202,12 +214,7 @@ class SentimentAnalyzer:
         for title, lyrics in lyrics_dict.items():
             lyrics_new = lyrics.lower()
             lyrics_new = re.sub(r"[\[].*?[\]]", "", lyrics_new)
-            # lyrics_new = lyrics_new.replace(r"verse |[1|2|3]|chorus|bridge|outro", "").replace("[",
-            #                                                                                            "").replace(
-            #     "]", "")
-            # lyrics_new = lyrics_new.lower().replace(r"instrumental|intro|guitar|solo", "")
             lyrics_new = lyrics_new.replace("\n", " ").replace(r"[^\w\d'\s]+", "")
-            # lyrics_new = lyrics_new.strip()
             words = word_tokenize(lyrics_new)
             contentwords = [w for w in words if w.lower() not in stopwords]
             dict_new[title] = ' '.join(contentwords)
@@ -217,6 +224,7 @@ class SentimentAnalyzer:
     def get_lyrics_emotions(self, lyrics_dict):
         # Analyze the lyrics for each song in the playlist
         scores_dict = {}
+
         for title, lyrics in lyrics_dict.items():
             if lyrics is not None:
                 # Compute the emotion scores for the lyrics
@@ -226,3 +234,28 @@ class SentimentAnalyzer:
 
         return scores_dict
 
+    def convert_emotions2polarity(self, emotions_dict):
+        polarity_list = []
+
+        for title, score in emotions_dict.items():
+            polarity = score['Happy'] - score['Angry'] + score['Surprise'] - score['Sad'] - score['Fear']
+            polarity_list.append(polarity)
+
+        return polarity_list
+
+    def get_compound_vader(self, vader_scores):
+        list = []
+
+        for title, score in vader_scores.items():
+            compound = score['compound']
+            list.append(compound)
+
+        return list
+
+    def get_polarity_textblob(self, textblob_scores):
+        list = []
+
+        for title, score in textblob_scores.items():
+            list.append(score)
+
+        return list

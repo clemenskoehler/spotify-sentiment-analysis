@@ -42,17 +42,20 @@ class GeniusAPI:
             A string containing the lyrics of the song, or None if the song was not found.
         """
         tracks_lyrics = {}
+        tracks_year = {}
 
         for track in tracks:
             try:
                 song = self.genius.search_song(track['name'], track['artists'][0]['name'])
                 if song is not None:
                     tracks_lyrics[track['name']] = song.lyrics
+                    # tracks_year[track['name']] = song.year
                     # print(track['name'], ": ", song.lyrics)
                 else:
                     tracks_lyrics[track['name']] = ""
+                    # tracks_year[track['name']] = 0
             except AttributeError:
                 tracks_lyrics[track['name']] = ""
 
-        return tracks_lyrics
+        return tracks_lyrics  # , tracks_year
 
