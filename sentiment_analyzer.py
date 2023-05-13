@@ -18,37 +18,6 @@ class SentimentAnalyzer:
         self.sid = SentimentIntensityAnalyzer()
         self.model = EasyNMT('opus-mt')
 
-    """
-    def get_lyrics_for_playlist(self, playlist_id, client_access_token):
-        """"""
-        Retrieve the lyrics for all songs in a Spotify playlist.
-        
-        Parameters:
-            playlist_id (str): The ID of the Spotify playlist to retrieve.
-            client_access_token (str): Your Spotify API client access token.
-            
-        Returns:
-            A dictionary mapping song names to lyrics.
-        """"""
-        genius = GeniusAPI()
-
-        # Authenticate with the Genius API
-        genius.authenticate("-YBRRHhrBgG0JIqi29wYKqNhvlilQ6heuJaN0VOR0z2eNiL4MadFf4PV_juK4cbD")
-
-        # Get the tracks in the playlist
-        tracks = SpotifyAPI.get_playlist_tracks(playlist_id)
-
-        # Retrieve the lyrics for each track in the playlist
-        lyrics_dict = {}
-        for track in tracks:
-            title = track['name']
-            artist = track['artists'][0]['name']
-            lyrics = genius.get_lyrics(title, artist)
-            lyrics_dict[title] = lyrics
-
-        return lyrics_dict
-    """
-
     def analyze_lyrics_vader(self, lyrics_dict):
         """
         Perform sentiment analysis on a dictionary of lyrics using the VADER sentiment analyzer.
